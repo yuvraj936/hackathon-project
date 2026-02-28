@@ -11,6 +11,10 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
+app.get("/", (req, res) => {
+  res.send("Backend is running ✅");
+});
+
 // ✅ CORS fix (127.0.0.1:3000 -> localhost:5001)
 app.use(cors({ origin: true, methods: ["GET","POST","OPTIONS"], allowedHeaders: ["Content-Type"] }));
 
