@@ -5,11 +5,34 @@ import path from "path";
 import { fileURLToPath } from "url";
 import chatRoutes from "./routes/chat.routes.js";
 import authRoutes from "./routes/auth.routes.js";
+import mysql from "mysql2";
+
 
 dotenv.config();
 
 const app = express();
 app.use(express.json());
+
+// 🔵 Database Connection YAHAN paste karo
+const pool = mysql.createPool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  port: process.env.DB_PORT,
+  ssl: {
+    rejectUnauthorized: false
+  }
+});
+
+pool.getConnection((err, connection) => {
+  if (err) {
+    console.error("❌ Database connection failed:", err);
+  } else {
+    console.log("✅ Database connected successfully");
+    connection.release();
+  }
+});
 
 app.get("/", (req, res) => {
   res.send("Backend is running ✅");
