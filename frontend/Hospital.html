@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Webdoc India | Smart Hospital Finder</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:Poppins, sans-serif;
+  background:linear-gradient(120deg,#000a19,#00285a);
+  color:#eaf6ff;
+  min-height:100vh;
+}
+
+/* NAVBAR */
+.navbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:20px 6vw;
+  backdrop-filter:blur(12px);
+  background:rgba(255,255,255,.05);
+  border-bottom:1px solid rgba(255,255,255,.15);
+  position:sticky;
+  top:0;
+  z-index:1000;
+}
+
+.logo{
+  font-family:Orbitron;
+  font-size:30px;
+  font-weight:800;
+  color:#00eaff;
+  letter-spacing:2px;
+}
+
+.nav-links a{
+  margin:0 12px;
+  text-decoration:none;
+  color:#eaf6ff;
+  font-weight:600;
+}
+
+.nav-links a:hover{color:#00eaff}
+
+.emergency-btn{
+  background:#ff3b3b;
+  padding:6px 14px;
+  border-radius:20px;
+}
+
+/* LAYOUT */
+.container{
+  display:flex;
+  margin-top:0;
+}
+
+/* SIDEBAR */
+.sidebar{
+  width:260px;
+  padding:25px;
+  background:rgba(255,255,255,.05);
+  backdrop-filter:blur(14px);
+  border-right:1px solid rgba(255,255,255,.15);
+  position:sticky;
+  top:80px; /* FIXED */
+  height:calc(100vh - 80px); /* FIXED */
+}
+
+.sidebar h3{
+  font-family:Orbitron;
+  color:#00eaff;
+  margin-bottom:20px;
+  text-align:center;
+}
+
+.sidebar select{
+  width:100%;
+  padding:10px;
+  margin-bottom:18px;
+  border-radius:8px;
+  border:1px solid #00eaff;
+  background:rgba(0,20,40,0.8);
+  color:#eaf6ff;
+  outline:none;
+}
+
+.sidebar select option{
+  background:#001b35;
+  color:#eaf6ff;
+}
+
+/* MAIN */
+.main{
+  flex:1;
+  padding:40px 60px;
+}
+
+/* HEADING */
+.page-header{
+  margin-bottom:20px;
+  text-align:center;
+}
+
+.page-header h1{
+  font-family:Orbitron;
+  font-size:44px;   /* Bigger like doctor page */
+  font-weight:800;
+  letter-spacing:2px;
+  color:#00eaff;
+  margin-bottom:14px;
+}
+
+.page-header p{
+  color:#b8dfff;
+  font-size:14px;
+  letter-spacing:1px;
+}
+
+/* SEARCH */
+.search-bar{
+  display:flex;
+  justify-content:center;
+  margin-bottom:45px;
+}
+
+.search-bar input{
+  width:55%;                 /* Smaller like doctor page */
+  padding:13px 22px;
+  border-radius:40px;
+  border:1.5px solid #00eaff;
+  background: rgba(255, 255, 255, .1);
+  backdrop-filter:blur(14px);
+  color:#fff;
+  font-size:15px;
+  outline:none;
+  transition:.3s;
+}
+
+.search-bar input:focus{
+  box-shadow:0 0 25px rgba(0,234,255,.6);
+  background: rgba(255, 255, 255, .15);
+}
+
+/* CARD */
+.hospital-card{
+  background:rgba(255,255,255,.05);
+  backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.15);
+  padding:18px;
+  border-radius:14px;
+  margin-bottom:12px;
+  transition:.3s;
+}
+
+.hospital-card:hover{
+  transform:translateY(-4px);
+  box-shadow:0 0 18px rgba(0,234,255,.4);
+}
+
+.hospital-card strong{
+  color:#00eaff;
+}
+
+.map-btn{
+  margin-top:10px;
+  padding:6px 14px;
+  border-radius:20px;
+  border:1px solid #00eaff;
+  background:rgba(0,234,255,0.15);
+  color:#00eaff;
+  cursor:pointer;
+  font-size:12px;
+  transition:.3s;
+}
+
+.map-btn:hover{
+  background:#00eaff;
+  color:#000;
+}
+/* SIDE SLIDE PANEL */
+.slide-panel{
+  position:fixed;
+  top:80px;
+  right:-320px;
+  width:300px;
+  height:calc(100vh - 80px);
+  background:rgba(0,20,40,0.95);
+  backdrop-filter:blur(15px);
+  border-left:1px solid rgba(0,234,255,.4);
+  padding:20px;
+  transition:.4s ease;
+  z-index:999;
+  overflow-y:auto;
+}
+
+.slide-panel.active{
+  right:0;
+}
+
+.slide-toggle{
+  position:fixed;
+  top:50%;
+  right:0;
+  transform:translateY(-50%);
+  background:rgba(0,234,255,.2);
+  border:none;
+  padding:12px 14px;
+  cursor:pointer;
+  border-radius:8px 0 0 8px;
+  color:#00eaff;
+  font-size:18px;
+  z-index:1000;
+  transition:.3s;
+}
+
+/* TOP HOSPITAL PANEL */
+.top-hospital-panel {
+    position: fixed;
+    top: 0;
+    right: -360px;
+    width: 360px;
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(18px);
+    border-left: 1px solid rgba(255, 255, 255, .2);
+    padding: 25px;
+    transition: .5s;
+    z-index: 2100;
+    overflow-y: auto;
+}
+
+.top-hospital-panel.active {
+    right: 0;
+}
+
+.top-hospital-toggle {
+    position: fixed;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(14px);
+    border-radius: 14px 0 0 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    color: #00eaff;
+    cursor: pointer;
+    z-index: 2101;
+    transition: .5s;
+}
+
+.top-hospital-toggle.active {
+    right: 360px;
+}
+
+.top-hospital-panel h2 {
+    font-family: Orbitron;
+    color: #00eaff;
+    margin-bottom: 20px;
+}
+
+.top-hospital-card {
+    background: rgba(0, 0, 0, .3);
+    padding: 14px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    font-size: 13px;
+    color: #cfeaff;
+}
+.premium-map-btn{
+    display:inline-block;
+    margin-top:10px;
+    padding:6px 14px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:.5px;
+    text-decoration:none;
+    border:1px solid #00eaff;
+    color:#00eaff;
+    background:rgba(0,234,255,0.12);
+    transition:.3s;
+}
+
+.premium-map-btn:hover{
+    background:#00eaff;
+    color:#000;
+    box-shadow:0 0 12px rgba(0,234,255,.6);
+}
+.hospital-name{
+    display:block;
+    font-size:15px;
+    font-weight:600;
+    color:#ffffff;
+    letter-spacing:.5px;
+    margin-bottom:6px;
+    padding-bottom:4px;
+    border-bottom:1px solid rgba(0,234,255,0.3);
+}
+/* ===== LOADING SCREEN ===== */
+/* ===== FINAL CLEAN LOADER ===== */
+
+#loading-screen{
+  position:fixed;
+  width:100%;
+  height:100vh;
+  background:linear-gradient(120deg, rgba(0,8,20,0.92), rgba(0,25,55,0.92));
+  backdrop-filter:blur(4px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  z-index:9999;
+  transition:opacity .6s ease, visibility .6s ease;
+}
+
+#loading-screen.hide{
+  opacity:0;
+  visibility:hidden;
+}
+
+/* ONLY ICON - NO BOX */
+.loader-icon{
+  font-size:85px;
+  color:#ffffff;
+  animation:floatIcon 2s ease-in-out infinite;
+}
+
+/* Loading Text */
+.loader-text{
+  margin-top:22px;
+  font-family:Orbitron, sans-serif;
+  font-size:18px;
+  letter-spacing:3px;
+  color:#ffffff;
+  opacity:.9;
+  animation:fadeBlink 1.6s infinite;
+}
+
+/* Subtle floating animation */
+@keyframes floatIcon{
+  0%{transform:translateY(0);}
+  50%{transform:translateY(-10px);}
+  100%{transform:translateY(0);}
+}
+
+@keyframes fadeBlink{
+  0%,100%{opacity:1;}
+  50%{opacity:.5;}
+}
+/* Static Circle */
+.loader-circle{
+  width:240px;
+  height:240px;
+  border-radius:50%;
+  border:2px solid rgba(0,234,255,0.5);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  box-shadow:0 0 25px rgba(0,234,255,0.25);
+}
+
+
+/* Dots container */
+.dots span{
+  display:inline-block;
+  animation:bounceDots 1.4s infinite;
+}
+
+/* Delay each dot */
+.dots span:nth-child(1){ animation-delay:0s; }
+.dots span:nth-child(2){ animation-delay:.2s; }
+.dots span:nth-child(3){ animation-delay:.4s; }
+
+/* Bounce animation */
+@keyframes bounceDots{
+  0%{ transform:translateY(0); opacity:.6; }
+  50%{ transform:translateY(-6px); opacity:1; }
+  100%{ transform:translateY(0); opacity:.6; }
+}
+</style>
+</head>
+
+<body>
+<!-- LOADING SCREEN -->
+<div id="loading-screen">
+    <div class="loader-circle">
+        <i class="fas fa-hospital loader-icon"></i>
+        <div class="loader-text">
+            Loading<span class="dots">
+                <span>.</span>
+                <span>.</span>
+                <span>.</span>
+            </span>
+        </div>
+    </div>
+</div>
+
+<div class="navbar">
+<div class="logo">WEBDOC INDIA</div>
+<div class="nav-links">
+<a href="home.html">Home</a>
+<a href="Dashboard.html">Dashboard</a>
+<a href="#HOSPITAL">Hospitals</a>
+<a href="Doctor.html">Doctors</a>
+<a href="Disease.html">Diseases</a>
+<a href="#future" onclick="showAmbulanceAlert()">Ambulance</a>
+<a href="About.html">About</a>
+<a href="home.html#contact">Contact</a>
+<a href="tel:102" class="emergency-btn">Emergency:102</a>
+</div>
+</div>
+<div class="top-hospital-toggle" id="hospitalToggleBtn" onclick="toggleTopHospitals()">&gt;</div>
+
+<div class="top-hospital-panel" id="topHospitalPanel">
+    <h2>Top Hospitals of India</h2>
+    <div id="topHospitalList"></div>
+</div>
+
+<div class="container">
+
+<div class="sidebar">
+<h3>Filter Options</h3>
+
+<select id="stateFilter" onchange="renderHospitals()">
+<option value="All">All States</option>
+<option value="Jharkhand">Jharkhand</option>
+<option value="Bihar">Bihar</option>
+<option value="Uttar Pradesh">Uttar Pradesh</option>
+</select>
+
+<select id="specFilter" onchange="renderHospitals()">
+<option value="All">All Specialization</option>
+<option value="Cardiology">Cardiology</option>
+<option value="Neurology">Neurology</option>
+<option value="Orthopedics">Orthopedics</option>
+<option value="Oncology">Oncology</option>
+<option value="Pediatrics">Pediatrics</option>
+<option value="Emergency">Emergency</option>
+</select>
+
+<select id="typeFilter" onchange="renderHospitals()">
+<option value="All">All Types</option>
+<option value="Government">Government</option>
+<option value="Private">Private</option>
+</select>
+
+</div>
+
+<div class="main">
+
+<div class="page-header">
+<h1>National Hospital Directory of India</h1>
+<p>Locate verified government and private hospitals across multiple states with advanced filtering.</p>
+</div>
+
+<div class="search-bar">
+<input type="text" id="searchInput" placeholder="Search Hospital or Specialization..." onkeyup="renderHospitals()">
+</div>
+
+<div id="hospitalContainer"></div>
+
+</div>
+</div>
+
+<script>
+    function showAmbulanceAlert(){alert('🚑 Smart Ambulance Tracking is coming soon! Our team is working on real-time live tracking feature.')}
+const hospitals = [
+
+/* ================= JHARKHAND (30) ================= */
+
+{state:"Jharkhand",name:"Rajendra Institute of Medical Sciences, Ranchi",city:"Ranchi",type:"Government",spec:"General",map:"https://www.google.com/maps/search/Rajendra+Institute+of+Medical+Sciences+Ranchi"},
+{state:"Jharkhand",name:"Tata Main Hospital, Jamshedpur",city:"Jamshedpur",type:"Private",spec:"Cardiology",map:"https://www.google.com/maps/search/Tata+Main+Hospital+Jamshedpur"},
+{state:"Jharkhand",name:"Medica Hospital, Ranchi",city:"Ranchi",type:"Private",spec:"Neurology",map:"https://www.google.com/maps/search/Medica+Hospital+Ranchi"},
+{state:"Jharkhand",name:"Bokaro General Hospital, Bokaro",city:"Bokaro",type:"Government",spec:"Emergency",map:"https://www.google.com/maps/search/Bokaro+General+Hospital+Bokaro"},
+{state:"Jharkhand",name:"Asarfi Hospital, Dhanbad",city:"Dhanbad",type:"Private",spec:"Oncology",map:"https://www.google.com/maps/search/Asarfi+Hospital+Dhanbad"},
+{state:"Jharkhand",name:"Sadar Hospital, Ranchi",city:"Ranchi",type:"Government",spec:"General",map:"https://www.google.com/maps/search/Sadar+Hospital+Ranchi"},
+{state:"Jharkhand",name:"Pulse Superspeciality Hospital, Ranchi",city:"Ranchi",type:"Private",spec:"Cardiology",map:"https://www.google.com/maps/search/Pulse+Superspeciality+Hospital+Ranchi"},
+{state:"Jharkhand",name:"Orchid Medical Centre, Ranchi",city:"Ranchi",type:"Private",spec:"Orthopedics",map:"https://www.google.com/maps/search/Orchid+Medical+Centre+Ranchi"},
+{state:"Jharkhand",name:"Gurunanak Hospital, Dhanbad",city:"Dhanbad",type:"Private",spec:"Emergency",map:"https://www.google.com/maps/search/Gurunanak+Hospital+Dhanbad"},
+{state:"Jharkhand",name:"Mangalam Hospital, Ranchi",city:"Ranchi",type:"Private",spec:"General",map:"https://www.google.com/maps/search/Mangalam+Hospital+Ranchi"},
+{state:"Jharkhand",name:"Railway Hospital, Dhanbad",city:"Dhanbad",type:"Government",spec:"General",map:"https://www.google.com/maps/search/Railway+Hospital+Dhanbad"},
+{state:"Jharkhand",name:"ESI Hospital, Ranchi",city:"Ranchi",type:"Government",spec:"General",map:"https://www.google.com/maps/search/ESI+Hospital+Ranchi"},
+{state:"Jharkhand",name:"CCL Central Hospital, Ranchi",city:"Ranchi",type:"Government",spec:"Emergency",map:"https://www.google.com/maps/search/CCL+Central+Hospital+Ranchi"},
+{state:"Jharkhand",name:"Hazaribagh Sadar Hospital, Hazaribagh",city:"Hazaribagh",type:"Government",spec:"General",map:"https://www.google.com/maps/search/Hazaribagh+Sadar+Hospital"},
+{state:"Jharkhand",name:"Dhanbad Sadar Hospital, Dhanbad",city:"Dhanbad",type:"Government",spec:"General",map:"https://www.google.com/maps/search/Dhanbad+Sadar+Hospital"},
+{state:"Jharkhand",name:"Palamu Medical College Hospital, Medininagar",city:"Medininagar",type:"Government",spec:"General",map:"https://www.google.com/maps/search/Palamu+Medical+College+Hospital+Medininagar"},
+{state:"Jharkhand",name:"Giridih Sadar Hospital, Giridih",city:"Giridih",type:"Government",spec:"General",map:"https://www.google.com/maps/search/Giridih+Sadar+Hospital"},
+{state:"Jharkhand",name:"Ramgarh Sadar Hospital, Ramgarh",city:"Ramgarh",type:"Government",spec:"General",map:"https://www.google.com/maps/search/Ramgarh+Sadar+Hospital"},
+{state:"Jharkhand",name:"Lohardaga District Hospital, Lohardaga",city:"Lohardaga",type:"Government",spec:"General",map:"https://www.google.com/maps/search/Lohardaga+District+Hospital"},
+{state:"Jharkhand",name:"Simdega District Hospital, Simdega",city:"Simdega",type:"Government",spec:"General",map:"https://www.google.com/maps/search/Simdega+District+Hospital"},
+{state:"Jharkhand",name:"Chaibasa District Hospital, Chaibasa",city:"Chaibasa",type:"Government",spec:"General",map:"https://www.google.com/maps/search/Chaibasa+District+Hospital"},
+{state:"Jharkhand",name:"Koderma District Hospital, Koderma",city:"Koderma",type:"Government",spec:"General",map:"https://www.google.com/maps/search/Koderma+District+Hospital"},
+{state:"Jharkhand",name:"Bariatu Cancer Hospital, Ranchi",city:"Ranchi",type:"Government",spec:"Oncology",map:"https://www.google.com/maps/search/Bariatu+Cancer+Hospital+Ranchi"},
+{state:"Jharkhand",name:"Hill View Hospital, Ranchi",city:"Ranchi",type:"Private",spec:"Pediatrics",map:"https://www.google.com/maps/search/Hill+View+Hospital+Ranchi"},
+{state:"Jharkhand",name:"Shanti Hospital, Ranchi",city:"Ranchi",type:"Private",spec:"Orthopedics",map:"https://www.google.com/maps/search/Shanti+Hospital+Ranchi"},
+{state:"Jharkhand",name:"Lifeline Hospital, Bokaro",city:"Bokaro",type:"Private",spec:"Cardiology",map:"https://www.google.com/maps/search/Lifeline+Hospital+Bokaro"},
+{state:"Jharkhand",name:"Apex Hospital, Ranchi",city:"Ranchi",type:"Private",spec:"Neurology",map:"https://www.google.com/maps/search/Apex+Hospital+Ranchi"},
+{state:"Jharkhand",name:"City Hospital, Jamshedpur",city:"Jamshedpur",type:"Private",spec:"General",map:"https://www.google.com/maps/search/City+Hospital+Jamshedpur"},
+{state:"Jharkhand",name:"Sai Hospital, Ranchi",city:"Ranchi",type:"Private",spec:"Emergency",map:"https://www.google.com/maps/search/Sai+Hospital+Ranchi"},
+{state:"Jharkhand",name:"Green City Hospital, Ranchi",city:"Ranchi",type:"Private",spec:"Cardiology",map:"https://www.google.com/maps/search/Green+City+Hospital+Ranchi"},
+
+/* ================= BIHAR (30) ================= */
+
+{state:"Bihar",name:"AIIMS Patna, Patna",city:"Patna",type:"Government",spec:"General",map:"https://www.google.com/maps/search/AIIMS+Patna+Bihar"},
+{state:"Bihar",name:"IGIMS, Patna",city:"Patna",type:"Government",spec:"Neurology",map:"https://www.google.com/maps/search/IGIMS+Patna+Bihar"},
+{state:"Bihar",name:"PMCH, Patna",city:"Patna",type:"Government",spec:"General",map:"https://www.google.com/maps/search/PMCH+Patna+Bihar"},
+{state:"Bihar",name:"NMCH, Patna",city:"Patna",type:"Government",spec:"Emergency",map:"https://www.google.com/maps/search/NMCH+Patna+Bihar"},
+{state:"Bihar",name:"Paras HMRI Hospital, Patna",city:"Patna",type:"Private",spec:"Cardiology",map:"https://www.google.com/maps/search/Paras+HMRI+Hospital+Patna+Bihar"},
+{state:"Bihar",name:"Ruban Memorial Hospital, Patna",city:"Patna",type:"Private",spec:"Orthopedics",map:"https://www.google.com/maps/search/Ruban+Memorial+Hospital+Patna+Bihar"},
+{state:"Bihar",name:"Ford Hospital, Patna",city:"Patna",type:"Private",spec:"Cardiology",map:"https://www.google.com/maps/search/Ford+Hospital+Patna+Bihar"},
+{state:"Bihar",name:"Big Apollo Spectra, Patna",city:"Patna",type:"Private",spec:"Orthopedics",map:"https://www.google.com/maps/search/Apollo+Spectra+Patna+Bihar"},
+{state:"Bihar",name:"DMCH, Darbhanga",city:"Darbhanga",type:"Government",spec:"General",map:"https://www.google.com/maps/search/DMCH+Darbhanga+Bihar"},
+{state:"Bihar",name:"SKMCH, Muzaffarpur",city:"Muzaffarpur",type:"Government",spec:"Pediatrics",map:"https://www.google.com/maps/search/SKMCH+Muzaffarpur+Bihar"},
+{state:"Bihar",name:"JLNMCH, Bhagalpur",city:"Bhagalpur",type:"Government",spec:"General",map:"https://www.google.com/maps/search/JLNMCH+Bhagalpur+Bihar"},
+{state:"Bihar",name:"ANMMCH, Gaya",city:"Gaya",type:"Government",spec:"General",map:"https://www.google.com/maps/search/ANMMCH+Gaya+Bihar"},
+{state:"Bihar",name:"Katihar Medical College, Katihar",city:"Katihar",type:"Private",spec:"General",map:"https://www.google.com/maps/search/Katihar+Medical+College+Bihar"},
+{state:"Bihar",name:"Narayan Medical College, Sasaram",city:"Sasaram",type:"Private",spec:"General",map:"https://www.google.com/maps/search/Narayan+Medical+College+Sasaram+Bihar"},
+{state:"Bihar",name:"MGM Medical College, Kishanganj",city:"Kishanganj",type:"Private",spec:"General",map:"https://www.google.com/maps/search/MGM+Medical+College+Kishanganj+Bihar"},
+{state:"Bihar",name:"Sadar Hospital, Arrah",city:"Arrah",type:"Government",spec:"General",map:"https://www.google.com/maps/search/Sadar+Hospital+Arrah+Bihar"},
+{state:"Bihar",name:"Sadar Hospital, Begusarai",city:"Begusarai",type:"Government",spec:"General",map:"https://www.google.com/maps/search/Sadar+Hospital+Begusarai+Bihar"},
+{state:"Bihar",name:"Sadar Hospital, Siwan",city:"Siwan",type:"Government",spec:"General",map:"https://www.google.com/maps/search/Sadar+Hospital+Siwan+Bihar"},
+{state:"Bihar",name:"Sadar Hospital, Purnea",city:"Purnea",type:"Government",spec:"General",map:"https://www.google.com/maps/search/Sadar+Hospital+Purnea+Bihar"},
+{state:"Bihar",name:"Sadar Hospital, Motihari",city:"Motihari",type:"Government",spec:"General",map:"https://www.google.com/maps/search/Sadar+Hospital+Motihari+Bihar"},
+{state:"Bihar",name:"Sadar Hospital, Munger",city:"Munger",type:"Government",spec:"General",map:"https://www.google.com/maps/search/Sadar+Hospital+Munger+Bihar"},
+{state:"Bihar",name:"Sadar Hospital, Nalanda",city:"Nalanda",type:"Government",spec:"General",map:"https://www.google.com/maps/search/Sadar+Hospital+Nalanda+Bihar"},
+{state:"Bihar",name:"Sadar Hospital, Samastipur",city:"Samastipur",type:"Government",spec:"General",map:"https://www.google.com/maps/search/Sadar+Hospital+Samastipur+Bihar"},
+{state:"Bihar",name:"Sadar Hospital, Sitamarhi",city:"Sitamarhi",type:"Government",spec:"General",map:"https://www.google.com/maps/search/Sadar+Hospital+Sitamarhi+Bihar"},
+{state:"Bihar",name:"Sadar Hospital, Madhepura",city:"Madhepura",type:"Government",spec:"General",map:"https://www.google.com/maps/search/Sadar+Hospital+Madhepura+Bihar"},
+{state:"Bihar",name:"Heart Hospital, Patna",city:"Patna",type:"Private",spec:"Cardiology",map:"https://www.google.com/maps/search/Heart+Hospital+Patna+Bihar"},
+{state:"Bihar",name:"Apex Hospital, Patna",city:"Patna",type:"Private",spec:"Neurology",map:"https://www.google.com/maps/search/Apex+Hospital+Patna+Bihar"},
+{state:"Bihar",name:"Shanti Hospital, Gaya",city:"Gaya",type:"Private",spec:"Orthopedics",map:"https://www.google.com/maps/search/Shanti+Hospital+Gaya+Bihar"},
+{state:"Bihar",name:"Care Hospital, Patna",city:"Patna",type:"Private",spec:"General",map:"https://www.google.com/maps/search/Care+Hospital+Patna+Bihar"},
+{state:"Bihar",name:"Sahara Hospital, Darbhanga",city:"Darbhanga",type:"Private",spec:"Emergency",map:"https://www.google.com/maps/search/Sahara+Hospital+Darbhanga+Bihar"},
+/* ================= UTTAR PRADESH (30) ================= */
+
+{state:"Uttar Pradesh",name:"SGPGI, Lucknow",city:"Lucknow",type:"Government",spec:"Neurology",map:"https://www.google.com/maps/search/SGPGI+Lucknow+Uttar+Pradesh"},
+{state:"Uttar Pradesh",name:"KGMU, Lucknow",city:"Lucknow",type:"Government",spec:"General",map:"https://www.google.com/maps/search/KGMU+Lucknow+Uttar+Pradesh"},
+{state:"Uttar Pradesh",name:"AIIMS Gorakhpur, Gorakhpur",city:"Gorakhpur",type:"Government",spec:"General",map:"https://www.google.com/maps/search/AIIMS+Gorakhpur+Uttar+Pradesh"},
+{state:"Uttar Pradesh",name:"Lohia Hospital, Lucknow",city:"Lucknow",type:"Government",spec:"Emergency",map:"https://www.google.com/maps/search/Lohia+Hospital+Lucknow"},
+{state:"Uttar Pradesh",name:"Apollo Medics, Lucknow",city:"Lucknow",type:"Private",spec:"Cardiology",map:"https://www.google.com/maps/search/Apollo+Medics+Lucknow"},
+{state:"Uttar Pradesh",name:"Medanta Hospital, Lucknow",city:"Lucknow",type:"Private",spec:"Cardiology",map:"https://www.google.com/maps/search/Medanta+Hospital+Lucknow"},
+{state:"Uttar Pradesh",name:"Fortis Hospital, Noida",city:"Noida",type:"Private",spec:"Cardiology",map:"https://www.google.com/maps/search/Fortis+Hospital+Noida"},
+{state:"Uttar Pradesh",name:"Yatharth Hospital, Noida",city:"Noida",type:"Private",spec:"Orthopedics",map:"https://www.google.com/maps/search/Yatharth+Hospital+Noida"},
+{state:"Uttar Pradesh",name:"Max Super Speciality Hospital, Ghaziabad",city:"Ghaziabad",type:"Private",spec:"Neurology",map:"https://www.google.com/maps/search/Max+Super+Speciality+Hospital+Ghaziabad"},
+{state:"Uttar Pradesh",name:"Heritage Hospital, Varanasi",city:"Varanasi",type:"Private",spec:"General",map:"https://www.google.com/maps/search/Heritage+Hospital+Varanasi"},
+{state:"Uttar Pradesh",name:"IMS BHU, Varanasi",city:"Varanasi",type:"Government",spec:"General",map:"https://www.google.com/maps/search/IMS+BHU+Varanasi"},
+{state:"Uttar Pradesh",name:"SN Medical College, Agra",city:"Agra",type:"Government",spec:"General",map:"https://www.google.com/maps/search/SN+Medical+College+Agra"},
+{state:"Uttar Pradesh",name:"MLN Medical College, Prayagraj",city:"Prayagraj",type:"Government",spec:"General",map:"https://www.google.com/maps/search/MLN+Medical+College+Prayagraj"},
+{state:"Uttar Pradesh",name:"BRD Medical College, Gorakhpur",city:"Gorakhpur",type:"Government",spec:"Pediatrics",map:"https://www.google.com/maps/search/BRD+Medical+College+Gorakhpur"},
+{state:"Uttar Pradesh",name:"District Hospital, Kanpur",city:"Kanpur",type:"Government",spec:"General",map:"https://www.google.com/maps/search/District+Hospital+Kanpur+Uttar+Pradesh"},
+{state:"Uttar Pradesh",name:"District Hospital, Meerut",city:"Meerut",type:"Government",spec:"General",map:"https://www.google.com/maps/search/District+Hospital+Meerut+Uttar+Pradesh"},
+{state:"Uttar Pradesh",name:"District Hospital, Bareilly",city:"Bareilly",type:"Government",spec:"General",map:"https://www.google.com/maps/search/District+Hospital+Bareilly+Uttar+Pradesh"},
+{state:"Uttar Pradesh",name:"District Hospital, Aligarh",city:"Aligarh",type:"Government",spec:"General",map:"https://www.google.com/maps/search/District+Hospital+Aligarh+Uttar+Pradesh"},
+{state:"Uttar Pradesh",name:"District Hospital, Jhansi",city:"Jhansi",type:"Government",spec:"General",map:"https://www.google.com/maps/search/District+Hospital+Jhansi+Uttar+Pradesh"},
+{state:"Uttar Pradesh",name:"District Hospital, Moradabad",city:"Moradabad",type:"Government",spec:"General",map:"https://www.google.com/maps/search/District+Hospital+Moradabad+Uttar+Pradesh"},
+{state:"Uttar Pradesh",name:"District Hospital, Saharanpur",city:"Saharanpur",type:"Government",spec:"General",map:"https://www.google.com/maps/search/District+Hospital+Saharanpur+Uttar+Pradesh"},
+{state:"Uttar Pradesh",name:"District Hospital, Azamgarh",city:"Azamgarh",type:"Government",spec:"General",map:"https://www.google.com/maps/search/District+Hospital+Azamgarh+Uttar+Pradesh"},
+{state:"Uttar Pradesh",name:"District Hospital, Sitapur",city:"Sitapur",type:"Government",spec:"General",map:"https://www.google.com/maps/search/District+Hospital+Sitapur+Uttar+Pradesh"},
+{state:"Uttar Pradesh",name:"District Hospital, Basti",city:"Basti",type:"Government",spec:"General",map:"https://www.google.com/maps/search/District+Hospital+Basti+Uttar+Pradesh"},
+{state:"Uttar Pradesh",name:"District Hospital, Ballia",city:"Ballia",type:"Government",spec:"General",map:"https://www.google.com/maps/search/District+Hospital+Ballia+Uttar+Pradesh"},
+{state:"Uttar Pradesh",name:"District Hospital, Etawah",city:"Etawah",type:"Government",spec:"General",map:"https://www.google.com/maps/search/District+Hospital+Etawah+Uttar+Pradesh"},
+{state:"Uttar Pradesh",name:"District Hospital, Shahjahanpur",city:"Shahjahanpur",type:"Government",spec:"General",map:"https://www.google.com/maps/search/District+Hospital+Shahjahanpur+Uttar+Pradesh"},
+{state:"Uttar Pradesh",name:"District Hospital, Rampur",city:"Rampur",type:"Government",spec:"General",map:"https://www.google.com/maps/search/District+Hospital+Rampur+Uttar+Pradesh"},
+{state:"Uttar Pradesh",name:"District Hospital, Mainpuri",city:"Mainpuri",type:"Government",spec:"General",map:"https://www.google.com/maps/search/District+Hospital+Mainpuri+Uttar+Pradesh"},
+{state:"Uttar Pradesh",name:"District Hospital, Fatehpur",city:"Fatehpur",type:"Government",spec:"General",map:"https://www.google.com/maps/search/District+Hospital+Fatehpur+Uttar+Pradesh"},
+
+];
+
+function renderHospitals(){
+
+let state=document.getElementById("stateFilter").value;
+let spec=document.getElementById("specFilter").value;
+let type=document.getElementById("typeFilter").value;
+let search=document.getElementById("searchInput").value.toLowerCase();
+
+let container=document.getElementById("hospitalContainer");
+container.innerHTML="";
+
+hospitals.forEach(h=>{
+if(
+(state==="All" || h.state===state) &&
+(h.name.toLowerCase().includes(search) || h.spec.toLowerCase().includes(search)) &&
+(spec==="All" || h.spec===spec) &&
+(type==="All" || h.type===type)
+){
+container.innerHTML+=`
+<div class="hospital-card">
+<strong>${h.name}</strong><br>
+Type: ${h.type}<br>
+Specialization: ${h.spec}<br>
+<button class="map-btn" onclick="window.open('${h.map}','_blank')">View Map</button>
+</div>
+`;
+}
+});
+
+}
+
+renderHospitals();
+const topHospitals = [
+{ name:"AIIMS New Delhi", city:"New Delhi", state:"Delhi", spec:"Multi-Speciality & Research", about:"India's premier government medical institute known for advanced research and critical care excellence.", map:"https://www.google.com/maps?q=AIIMS+New+Delhi" },
+
+{ name:"Apollo Hospitals", city:"Chennai", state:"Tamil Nadu", spec:"Cardiology & Organ Transplant", about:"Pioneer of corporate healthcare in India with world-class cardiac and transplant services.", map:"https://www.google.com/maps?q=Apollo+Hospitals+Chennai" },
+
+{ name:"Fortis Memorial Research Institute", city:"Gurgaon", state:"Haryana", spec:"Neurology & Critical Care", about:"Advanced quaternary care hospital equipped with cutting-edge international medical technology.", map:"https://www.google.com/maps?q=Fortis+Memorial+Research+Institute+Gurgaon" },
+
+{ name:"Tata Memorial Hospital", city:"Mumbai", state:"Maharashtra", spec:"Oncology", about:"Leading national cancer treatment and research centre under the Government of India.", map:"https://www.google.com/maps?q=Tata+Memorial+Hospital+Mumbai" },
+
+{ name:"Medanta - The Medicity", city:"Gurgaon", state:"Haryana", spec:"Cardiac Sciences & Surgery", about:"Renowned multi-super speciality institute founded by Dr. Naresh Trehan.", map:"https://www.google.com/maps?q=Medanta+The+Medicity+Gurgaon" },
+
+{ name:"Christian Medical College", city:"Vellore", state:"Tamil Nadu", spec:"Multi-Speciality", about:"Globally respected teaching hospital known for ethical and affordable care.", map:"https://www.google.com/maps?q=Christian+Medical+College+Vellore" },
+
+{ name:"Narayana Health", city:"Bengaluru", state:"Karnataka", spec:"Cardiac Sciences", about:"Recognized for high-quality yet affordable heart surgeries and specialty care.", map:"https://www.google.com/maps?q=Narayana+Health+Bangalore" },
+
+{ name:"Max Super Speciality Hospital", city:"New Delhi", state:"Delhi", spec:"Oncology & Neurosciences", about:"Premium private healthcare chain offering advanced diagnostics and surgical excellence.", map:"https://www.google.com/maps?q=Max+Super+Speciality+Hospital+Delhi" },
+
+{ name:"Kokilaben Dhirubhai Ambani Hospital", city:"Mumbai", state:"Maharashtra", spec:"Multi-Speciality", about:"State-of-the-art tertiary care hospital with international treatment protocols.", map:"https://www.google.com/maps?q=Kokilaben+Hospital+Mumbai" },
+
+{ name:"Manipal Hospitals", city:"Bengaluru", state:"Karnataka", spec:"Comprehensive Care", about:"Leading private healthcare provider with a strong academic and research base.", map:"https://www.google.com/maps?q=Manipal+Hospital+Bangalore" },
+
+{ name:"PGIMER", city:"Chandigarh", state:"Chandigarh", spec:"Medical Research & Teaching", about:"Postgraduate institute delivering advanced medical education and tertiary care.", map:"https://www.google.com/maps?q=PGIMER+Chandigarh" },
+
+{ name:"Sir Ganga Ram Hospital", city:"New Delhi", state:"Delhi", spec:"Multi-Speciality", about:"One of Delhi’s most reputed private hospitals with decades of clinical excellence.", map:"https://www.google.com/maps?q=Sir+Ganga+Ram+Hospital+Delhi" },
+
+{ name:"Lilavati Hospital", city:"Mumbai", state:"Maharashtra", spec:"Multi-Speciality", about:"Well-known Mumbai hospital offering comprehensive and advanced treatments.", map:"https://www.google.com/maps?q=Lilavati+Hospital+Mumbai" },
+
+{ name:"Ruby Hall Clinic", city:"Pune", state:"Maharashtra", spec:"Multi-Speciality", about:"One of Pune’s oldest and most trusted private hospitals.", map:"https://www.google.com/maps?q=Ruby+Hall+Clinic+Pune" },
+
+{ name:"CARE Hospitals", city:"Hyderabad", state:"Telangana", spec:"Cardiac & Critical Care", about:"Highly regarded healthcare group specializing in cardiac and emergency services.", map:"https://www.google.com/maps?q=CARE+Hospitals+Hyderabad" }
+];
+
+function renderTopHospitals(){
+let list=document.getElementById("topHospitalList");
+topHospitals.forEach(h=>{
+let div=document.createElement("div");
+div.className="top-hospital-card";
+div.innerHTML=`
+<span class="hospital-name">${h.name}</span>
+<span style="color:#00eaff;">Specialization:</span> ${h.spec}<br>
+<span style="color:#00eaff;">Location:</span> ${h.city}, ${h.state}<br><br>
+<div style="font-size:12px;opacity:.85;margin-bottom:10px;">
+${h.about}
+</div>
+<a href="${h.map}" target="_blank" class="premium-map-btn">📍 Live Directions</a>
+`;
+list.appendChild(div);
+});
+}
+renderTopHospitals();
+
+function toggleTopHospitals(){
+const panel=document.getElementById("topHospitalPanel");
+const btn=document.getElementById("hospitalToggleBtn");
+panel.classList.toggle("active");
+btn.classList.toggle("active");
+btn.innerHTML=panel.classList.contains("active")?"<":">";
+}
+window.addEventListener("load", function(){
+  setTimeout(function(){
+    document.getElementById("loading-screen").classList.add("hide");
+  }, 1000);
+});
+
+</script>
+
+</body>
+</html>

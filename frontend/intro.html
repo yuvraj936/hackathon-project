@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WEBDOC INDIA..</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+    height:100vh;
+    background:radial-gradient(circle at center,#061a2b,#020b15 70%);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Orbitron',sans-serif;
+    overflow:hidden;
+}
+
+.jarvis-box{
+    text-align:center;
+    animation:fadeIn 1.5s ease;
+}
+
+.jarvis-title{
+    font-size:70px;
+    color:#00eaff;
+    letter-spacing:5px;
+    text-shadow:0 0 25px #00eaff;
+    margin-bottom:15px;
+}
+
+.jarvis-sub{
+    font-family:'Poppins',sans-serif;
+    color:#9fdfff;
+    margin-bottom:45px;
+}
+
+/* ===== BUTTON ===== */
+.enter-btn{
+    padding:16px 48px;
+    font-size:18px;
+    border:none;
+    border-radius:40px;
+    background:linear-gradient(90deg,#00eaff,#0072ff);
+    color:white;
+    cursor:pointer;
+    transition:0.3s;
+    box-shadow:0 0 25px rgba(0,234,255,0.6);
+}
+
+.enter-btn:hover{
+    transform:scale(1.1);
+    box-shadow:0 0 45px rgba(0,234,255,1);
+}
+
+/* ===== LOADER ===== */
+.loader{
+    margin-top:40px;
+    width:80px;
+    height:80px;
+    border:4px solid rgba(0,234,255,0.2);
+    border-top:4px solid #00eaff;
+    border-radius:50%;
+    animation:spin 1s linear infinite;
+    display:none;
+    margin-left:auto;
+    margin-right:auto;
+}
+
+.loading-text{
+    margin-top:15px;
+    color:#9fdfff;
+    font-family:'Poppins',sans-serif;
+    display:none;
+}
+
+@keyframes spin{
+    to{transform:rotate(360deg);}
+}
+
+@keyframes fadeIn{
+    from{opacity:0; transform:scale(0.9);}
+    to{opacity:1; transform:scale(1);}
+}
+</style>
+</head>
+
+<body>
+
+<div class="jarvis-box">
+    <h1 class="jarvis-title">WEBDOC INDIA</h1>
+    <p class="jarvis-sub">Initializing Health Intelligence...</p>
+
+    <button class="enter-btn" id="enterBtn">ENTER SYSTEM</button>
+
+    <div class="loader" id="loader"></div>
+    <div class="loading-text" id="loadingText">Accessing System...</div>
+</div>
+
+<audio id="jarvisSound" src="sound.mp3.wav" preload="auto"></audio>
+
+<script>
+document.getElementById("enterBtn").addEventListener("click", function(){
+
+    const btn = this;
+    const loader = document.getElementById("loader");
+    const text = document.getElementById("loadingText");
+    const sound = document.getElementById("jarvisSound");
+
+    // play sound
+    if(sound){
+        sound.currentTime = 0;
+        sound.play().catch(()=>{});
+    }
+
+    // show animation
+    btn.style.display = "none";
+    loader.style.display = "block";
+    text.style.display = "block";
+
+    // 👇 APNA MAIN PAGE LINK DALNA
+    setTimeout(()=>{
+        window.location.href = "home.html";
+    }, 700);
+});
+</script>
+
+</body>
+</html>

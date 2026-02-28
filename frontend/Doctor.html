@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webdoc India | Medical Specialists</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        html {
+            scroll-behavior: smooth
+        }
+
+        body {
+            font-family: Poppins, sans-serif;
+            background: linear-gradient(120deg, #000a19, #00285a);
+            color: #eaf6ff;
+            min-height: 100vh;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 6vw;
+            backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, .05);
+            border-bottom: 1px solid rgba(255, 255, 255, .15);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-family: Orbitron;
+            font-size: 30px;
+            font-weight: 800;
+            color: #00eaff;
+            letter-spacing: 2px;
+        }
+
+        .nav-links a {
+            margin: 0 12px;
+            text-decoration: none;
+            color: #eaf6ff;
+            font-weight: 600
+        }
+
+        .nav-links a:hover {
+            color: #00eaff
+        }
+
+        .emergency-btn {
+            background: #ff3b3b;
+            padding: 6px 14px;
+            border-radius: 20px
+        }
+
+        /* HEADER */
+        .page-header {
+            text-align: center;
+            padding: 50px 20px 10px
+        }
+
+        .page-header h1 {
+            font-family: Orbitron;
+            font-size: 40px;
+            color: #00eaff
+        }
+
+        .page-header p {
+            margin-top: 8px;
+            color: #cfeaff
+        }
+
+        /* SEARCH */
+        .search-container {
+            display: flex;
+            justify-content: center;
+            padding: 10px 20px;
+        }
+
+        .search-container input {
+            width: 100%;
+            max-width: 650px;
+            padding: 14px 20px;
+            border-radius: 30px;
+            border: 1px solid #00eaff;
+            outline: none;
+            font-size: 15px;
+            background: rgba(255, 255, 255, .1);
+            color: #fff;
+            transition: .3s;
+        }
+
+        .search-container input:focus {
+            background: rgba(255, 255, 255, .15);
+            box-shadow: 0 0 12px rgba(0, 234, 255, .5);
+        }
+
+
+        /* SECTION */
+        .specialization-section {
+            padding: 40px 6vw
+        }
+
+        .specialization-title {
+            font-family: Orbitron;
+            font-size: 26px;
+            color: #00eaff;
+            margin-bottom: 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, .2);
+            padding-bottom: 8px;
+        }
+
+        /* GRID */
+        .doctor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 18px;
+            margin-bottom: 48px;
+        }
+
+        .doctor-card {
+            padding: 18px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, .05);
+            border: 1px solid rgba(255, 255, 255, .15);
+            backdrop-filter: blur(10px);
+            transition: .3s;
+        }
+
+        .doctor-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 18px rgba(0, 234, 255, .3);
+        }
+
+        .doctor-card h3 {
+            color: #00eaff;
+            font-size: 16px;
+            margin-bottom: 6px
+        }
+
+        .doctor-info {
+            font-size: 13px;
+            margin-bottom: 4px;
+            color: #cfeaff
+        }
+
+        /* BUTTONS */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px
+        }
+
+        .action-btn {
+            padding: 6px 10px;
+            border-radius: 14px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: 0.3s;
+        }
+
+        .certificate-btn {
+            background: rgba(0, 234, 255, 0.15);
+            color: #00eaff;
+            border: 1px solid #00eaff;
+        }
+
+        .certificate-btn:hover {
+            background: #00eaff;
+            color: #000
+        }
+
+        .location-btn {
+            background: rgba(255, 152, 0, 0.15);
+            color: #ffb74d;
+            border: 1px solid #ffb74d;
+            text-decoration: none;
+        }
+
+        .location-btn:hover {
+            background: #ffb74d;
+            color: #000
+        }
+
+        /* EXACT OLD POPUP STYLE */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(6px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.4s ease;
+            z-index: 2000;
+        }
+
+        .popup-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* POPUP BOX */
+        .popup-box {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(15px);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            width: 90%;
+            max-width: 420px;
+            box-shadow: 0 0 25px rgba(0, 234, 255, 0.4);
+            transform: scale(0.8);
+            transition: 0.4s ease;
+        }
+
+        .popup-overlay.active .popup-box {
+            transform: scale(1);
+        }
+
+        .popup-box i {
+            font-size: 40px;
+            color: #00eaff;
+            margin-bottom: 15px;
+        }
+
+        .popup-box h2 {
+            font-family: Orbitron;
+            margin-bottom: 10px;
+            color: #00eaff;
+        }
+
+        .popup-box p {
+            font-size: 14px;
+            color: #eaf6ff;
+            margin-bottom: 20px;
+        }
+
+        .close-btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 20px;
+            background: #00eaff;
+            color: #000;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .close-btn:hover {
+            background: #68dacb;
+        }
+
+        /* SLIDE PANEL */
+        .top-doctor-panel {
+            position: fixed;
+            top: 0;
+            right: -360px;
+            width: 360px;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(18px);
+            border-left: 1px solid rgba(255, 255, 255, .2);
+            padding: 25px;
+            transition: .5s;
+            z-index: 2100;
+            overflow-y: auto;
+        }
+
+        .top-doctor-panel.active {
+            right: 0
+        }
+
+        .top-doctor-toggle {
+            position: fixed;
+            top: 50%;
+            right: 0;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(14px);
+            border-radius: 14px 0 0 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            color: #00eaff;
+            cursor: pointer;
+            z-index: 2101;
+            transition: .5s;
+        }
+
+        .top-doctor-toggle.active {
+            right: 360px
+        }
+
+        .top-doctor-panel h2 {
+            font-family: Orbitron;
+            color: #00eaff;
+            margin-bottom: 20px
+        }
+
+        .top-doc-card {
+            background: rgba(0, 0, 0, .3);
+            padding: 14px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            color: #cfeaff;
+        }#loading-screen{
+  position:fixed;
+  width:100%;
+  height:100vh;
+  background:linear-gradient(120deg, rgba(0,8,20,0.92), rgba(0,25,55,0.92));
+  backdrop-filter:blur(4px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  z-index:9999;
+  transition:opacity .6s ease, visibility .6s ease;
+}
+
+#loading-screen.hide{
+  opacity:0;
+  visibility:hidden;
+}
+
+/* ONLY ICON - NO BOX */
+.loader-icon{
+  font-size:85px;
+  color:#ffffff;
+  animation:floatIcon 2s ease-in-out infinite;
+}
+
+/* Loading Text */
+.loader-text{
+  margin-top:22px;
+  font-family:Orbitron, sans-serif;
+  font-size:18px;
+  letter-spacing:3px;
+  color:#ffffff;
+  opacity:.9;
+  animation:fadeBlink 1.6s infinite;
+}
+
+/* Subtle floating animation */
+@keyframes floatIcon{
+  0%{transform:translateY(0);}
+  50%{transform:translateY(-10px);}
+  100%{transform:translateY(0);}
+}
+
+@keyframes fadeBlink{
+  0%,100%{opacity:1;}
+  50%{opacity:.5;}
+}
+/* Static Circle */
+.loader-circle{
+  width:240px;
+  height:240px;
+  border-radius:50%;
+  border:2px solid rgba(0,234,255,0.5);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  box-shadow:0 0 25px rgba(0,234,255,0.25);
+}
+
+
+/* Dots container */
+.dots span{
+  display:inline-block;
+  animation:bounceDots 1.4s infinite;
+}
+
+/* Delay each dot */
+.dots span:nth-child(1){ animation-delay:0s; }
+.dots span:nth-child(2){ animation-delay:.2s; }
+.dots span:nth-child(3){ animation-delay:.4s; }
+
+/* Bounce animation */
+@keyframes bounceDots{
+  0%{ transform:translateY(0); opacity:.6; }
+  50%{ transform:translateY(-6px); opacity:1; }
+  100%{ transform:translateY(0); opacity:.6; }
+}
+    </style>
+</head>
+
+<body>
+<!-- LOADING SCREEN -->
+<div id="loading-screen">
+    <div class="loader-circle">
+        <i class="fas fa-user-doctor loader-icon"></i>
+        <div class="loader-text">
+            Loading<span class="dots">
+                <span>.</span>
+                <span>.</span>
+                <span>.</span>
+            </span>
+        </div>
+    </div>
+</div>
+    <!-- Popup -->
+    <div class="popup-overlay" id="certificatePopup">
+        <div class="popup-box">
+            <i class="fa-solid fa-shield-halved"></i>
+            <h2>Access Restricted</h2>
+            <p>
+                Due to security and legal compliance policies,<br>
+                official certificate records cannot be displayed publicly.
+            </p>
+            <button class="close-btn" onclick="closePopup()">Understood</button>
+        </div>
+    </div>
+
+    <div class="navbar">
+        <div class="logo">WEBDOC INDIA</div>
+        <div class="nav-links">
+            <a href="home.html">Home</a>
+            <a href="Dashboard.html">Dashboard</a>
+            <a href="Hospital.html">Hospitals</a>
+            <a href="#DOCTORS">Doctors</a>
+            <a href="Disease.html">Diseases</a>
+           <a href="#future" onclick="showAmbulanceAlert()">Ambulance</a>
+            <a href="About.html">About</a>
+            <a href="home.html#contact">Contact</a>
+            <a href="tel:102" class="emergency-btn">Emergency:102</a>
+        </div>
+    </div>
+
+    <div class="page-header">
+        <h1>India's National Medical Specialist Directory</h1>
+        <p>Explore a comprehensive list of certified medical professionals across India</p>
+    </div>
+
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Search by name or specialization...">
+    </div>
+
+    <div id="doctorSections"></div>
+
+    <div class="top-doctor-toggle" id="toggleBtn" onclick="toggleTopDoctors()">&gt;</div>
+
+    <div class="top-doctor-panel" id="topDoctorPanel">
+        <h2>Top Doctors of India</h2>
+        <div id="topDoctorList"></div>
+    </div>
+  
+
+    <script>
+        function showPopup() { document.getElementById("certificatePopup").classList.add("active") }
+        function closePopup() { document.getElementById("certificatePopup").classList.remove("active") }
+        function showAmbulanceAlert(){alert('🚑 Smart Ambulance Tracking is coming soon! Our team is working on real-time live tracking feature.')}
+
+
+        /* INCREASED SPECIALIZATION LIST */
+        const specializations = [
+            "Cardiologist", "Neurologist", "Orthopedic", "Dermatologist", "Pediatrician",
+            "Oncologist", "Psychiatrist", "ENT Specialist", "Gastroenterologist",
+            "Nephrologist", "Urologist", "Pulmonologist", "Endocrinologist",
+            "Gynecologist", "General Physician", "Rheumatologist",
+            "Plastic Surgeon", "Radiologist", "Hematologist",
+            "Anesthesiologist", "Immunologist", "Pathologist"
+        ];
+
+        const hospitals = [
+            { name: "AIIMS - New Delhi", map: "https://www.google.com/maps?q=All+India+Institute+of+Medical+Sciences+New+Delhi&hl=en" },
+            { name: "Apollo Hospital - Chennai", map: "https://www.google.com/maps?q=Apollo+Hospital+Chennai&hl=en" },
+            { name: "Fortis Hospital - Mumbai", map: "https://www.google.com/maps?q=Fortis+Hospital+Mumbai&hl=en" },
+            { name: "Max Hospital - Delhi", map: "https://www.google.com/maps?q=Max+Hospital+Delhi&hl=en" },
+            { name: "Medanta - Gurgaon", map: "https://www.google.com/maps?q=Medanta+The+Medicty+Gurgaon&hl=en" },
+            { name: "Manipal Hospital - Bangalore", map: "https://www.google.com/maps?q=Manipal+Hospital+Bangalore&hl=en" },
+            { name: "Narayana Health - Kolkata", map: "https://www.google.com/maps?q=Narayana+Health+Kolkata&hl=en" },
+            { name: "KIMS Hospital - Hyderabad", map: "https://www.google.com/maps?q=KIMS+Hospital+Hyderabad&hl=en" },
+            { name: "Care Hospital - Pune", map: "https://www.google.com/maps?q=Care+Hospital+Pune&hl=en" },
+            { name: "Amrita Hospital - Kochi", map: "https://www.google.com/maps?q=Amrita+Hospital+Kochi&hl=en" }
+        ];
+        const degrees = ["MBBS", "MD", "MS", "DNB", "DM", "MCh"];
+
+        let doctors = [];
+        const fnames = ["Amit", "Sneha", "Rohan", "Preeti", "Vikram", "Anjali", "Rahul", "Swati"];
+        const lnames = ["Sharma", "Verma", "Singh", "Patel", "Gupta", "Mehta"];
+
+        for (let i = 1; i <= 600; i++) {
+            const hospitalObj = hospitals[Math.floor(Math.random() * hospitals.length)];
+            doctors.push({
+                name: "Dr. " + fnames[Math.floor(Math.random() * fnames.length)] + " " + lnames[Math.floor(Math.random() * lnames.length)],
+                specialization: specializations[Math.floor(Math.random() * specializations.length)],
+                hospital: hospitalObj.name,
+                mapLink: hospitalObj.map,
+                experience: (5 + Math.floor(Math.random() * 25)) + " Years",
+                degree: degrees[Math.floor(Math.random() * degrees.length)]
+            });
+        }
+
+        function renderDoctors(filter = "") {
+            document.getElementById("doctorSections").innerHTML = "";
+            specializations.forEach(spec => {
+                const filtered = doctors.filter(d => d.specialization === spec && (d.name.toLowerCase().includes(filter) || d.specialization.toLowerCase().includes(filter)));
+                if (!filtered.length) return;
+                const sec = document.createElement("div");
+                sec.className = "specialization-section";
+                sec.innerHTML = `<div class="specialization-title">${spec}</div><div class="doctor-grid"></div>`;
+                const grid = sec.querySelector(".doctor-grid");
+                filtered.forEach(doc => {
+                    const card = document.createElement("div");
+                    card.className = "doctor-card";
+                    card.innerHTML = `
+<h3>${doc.name}</h3>
+<div class="doctor-info"><strong>Working At:</strong> ${doc.hospital}</div>
+<div class="doctor-info"><strong>Experience:</strong> ${doc.experience}</div>
+<div class="doctor-info"><strong>Degree:</strong> ${doc.degree}</div>
+<div class="action-buttons">
+<button class="action-btn certificate-btn" onclick="showPopup()">View Certificate</button>
+<a href="${doc.mapLink}" target="_blank" class="action-btn location-btn">📍 Live Location</a>
+</div>`;
+                    grid.appendChild(card);
+                });
+                document.getElementById("doctorSections").appendChild(sec);
+            });
+        }
+        renderDoctors();
+
+        document.getElementById("searchInput").addEventListener("input", function () {
+            renderDoctors(this.value.toLowerCase());
+        });
+
+        function renderTopDoctors() {
+            let list = document.getElementById("topDoctorList");
+            let top15 = doctors.slice(0, 15);
+            top15.forEach(doc => {
+                let div = document.createElement("div");
+                div.className = "top-doc-card";
+                div.innerHTML = `
+<strong>${doc.name}</strong><br>
+${doc.specialization}<br>
+${doc.degree}<br>
+Experience: ${doc.experience}<br>
+Hospital: ${doc.hospital}
+`;
+                list.appendChild(div);
+            });
+        }
+        renderTopDoctors();
+
+        function toggleTopDoctors() {
+            const panel = document.getElementById("topDoctorPanel");
+            const btn = document.getElementById("toggleBtn");
+            panel.classList.toggle("active");
+            btn.classList.toggle("active");
+            btn.innerHTML = panel.classList.contains("active") ? "<" : ">";
+        }
+        window.addEventListener("load", function(){
+  setTimeout(function(){
+    document.getElementById("loading-screen").classList.add("hide");
+  }, 1000);
+});
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>India Disease Intelligence | Webdoc</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<link rel="stylesheet" href="/frontend/web.css">
+
+<style>
+body{margin:0;font-family:Poppins;background:#0b1c2c;color:white;}
+.header{padding:20px 30px;border-bottom:1px solid #00eaff33;}
+.header h1{margin:0;color:#00eaff;}
+.container{padding:20px;}
+
+.search-box{
+    background:#102a3a;
+    padding:12px;
+    border-radius:12px;
+    margin-bottom:20px;
+    border:1px solid #00eaff33;
+    max-width:420px;
+}
+.search-box input{
+    width:100%;
+    background:transparent;
+    border:none;
+    outline:none;
+    color:white;
+}
+
+.disease-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:18px;
+}
+
+.disease-card{
+    background:#0f2433;
+    padding:14px;
+    border-radius:14px;
+    border:1px solid transparent;
+    transition:.25s;
+    cursor:pointer;
+}
+.disease-card:hover{
+    border-color:#00eaff;
+    transform:translateY(-3px);
+}
+
+.tag{
+    display:inline-block;
+    background:#00eaff22;
+    color:#00eaff;
+    font-size:11px;
+    padding:3px 7px;
+    border-radius:6px;
+    margin-bottom:6px;
+}
+
+.symptoms{font-size:13px;color:#9fdfff;}
+
+.map-wrapper{margin-top:30px;display:none;}
+
+#map{
+    height:480px;
+    border-radius:16px;
+    border:1px solid #00eaff33;
+}
+
+.legend{
+    margin-top:10px;
+    background:#102a3a;
+    padding:10px;
+    border-radius:10px;
+    font-size:12px;
+    color:#9fdfff;
+    border:1px solid #00eaff33;
+    display:inline-block;
+}
+
+/* toast */
+.toast{
+ position:fixed;
+ top:20px;
+ right:20px;
+ background:#102a3a;
+ color:#00eaff;
+ padding:12px 16px;
+ border-radius:10px;
+ border:1px solid #00eaff55;
+ box-shadow:0 0 15px rgba(0,234,255,.25);
+ opacity:0;
+ transform:translateY(-20px);
+ transition:.35s;
+ z-index:9999;
+}
+.toast.show{opacity:1;transform:translateY(0);}
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.profile-wrap{ position:relative; }
+
+.avatar{
+  width:42px;height:42px;
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#00eaff,#007bff);
+  color:#00111f;
+  font-weight:800;
+  cursor:pointer;
+  box-shadow:0 0 18px rgba(0,234,255,.25);
+}
+
+.profile-menu{
+  position:absolute;
+  right:0;
+  top:52px;
+  width:260px;
+  background:#102a3a;
+  border:1px solid #00eaff33;
+  border-radius:14px;
+  padding:12px;
+  display:none;
+  z-index:9999;
+}
+
+.profile-menu.show{ display:block; }
+
+.pm-head{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  padding-bottom:10px;
+  border-bottom:1px solid rgba(255,255,255,.12);
+  margin-bottom:10px;
+}
+
+.pm-avatar{
+  width:42px;height:42px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:#00eaff22;color:#00eaff;font-weight:800;
+}
+
+.pm-name{ font-weight:700; }
+.pm-email{ font-size:12px; color:#9fdfff; }
+
+.pm-row{
+  font-size:13px;
+  color:#cfeaff;
+  margin:7px 0;
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.pm-btn{
+  width:100%;
+  margin-top:10px;
+  padding:10px 12px;
+  border:none;
+  border-radius:10px;
+  background:#00eaff;
+  cursor:pointer;
+  font-weight:800;
+}
+/* Force hide any center profile lines */
+.profile-card, .profile-box, .user-info, #profileCard, #userInfo {
+  display: none !important;
+}
+</style>
+</head>
+<body>
+
+<div class="header topbar">
+  <h1>🧠 Disease Intelligence 2026</h1>
+
+  <div class="profile-wrap">
+    <div id="profileAvatar" class="avatar" title="Profile">👤</div>
+
+    <div id="profileMenu" class="profile-menu">
+      <div class="pm-head">
+        <div class="pm-avatar" id="pmAvatar">👤</div>
+        <div>
+          <div class="pm-name" id="pmName">Loading...</div>
+          <div class="pm-email" id="pmEmail">—</div>
+        </div>
+      </div>
+
+      <div class="pm-row"><b>Mobile:</b> <span id="pmMobile">—</span></div>
+      <div class="pm-row"><b>User ID:</b> <span id="pmId">—</span></div>
+
+      <button class="pm-btn" onclick="logout()">Logout</button>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  
+<div class="search-box">
+🔍 <input type="text" id="searchInput" placeholder="Search disease...">
+</div>
+
+<div class="disease-grid" id="diseaseList"></div>
+
+<div class="map-wrapper" id="mapWrapper">
+    <h2 style="color:#00eaff;">📍 Disease Hotspot Map</h2>
+    <div id="map"></div>
+    <div class="legend">
+        🔴 Very High (>2000)<br>
+        🟠 High (1500–2000)<br>
+        🟡 Moderate (1000–1500)<br>
+        🔵 Lower (<1000)
+    </div>
+</div>
+<div class="disclaimer">
+⚠️ This information is for basic guidance only. Always consult a qualified doctor for medical diagnosis.
+</div>
+
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+
+// ===== MAP =====
+let map;
+let mapInitialized=false;
+let allMarkers=[];
+
+function initMap(){
+    if(mapInitialized) return;
+    map = L.map('map').setView([22.9734, 78.6569], 5);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    mapInitialized=true;
+}
+
+function getColor(cases){
+    if(cases > 2000) return "#ff0000";
+    if(cases > 1500) return "#ff6a00";
+    if(cases > 1000) return "#ffcc00";
+    return "#00eaff";
+}
+
+function showToast(msg){
+ const t=document.getElementById('toast');
+ t.innerText=msg;
+ t.classList.add('show');
+ setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// ===== HOTSPOT DATA =====
+const indiaData=[
+{state:"Delhi", disease:"Dengue", cases:2500, lat:28.6139, lng:77.2090},
+{state:"Maharashtra", disease:"Dengue", cases:2300, lat:19.0760, lng:72.8777},
+{state:"Kerala", disease:"Dengue", cases:1700, lat:8.5241, lng:76.9366},
+{state:"Odisha", disease:"Malaria", cases:2100, lat:20.2961, lng:85.8245},
+{state:"Jharkhand", disease:"Malaria", cases:2000, lat:23.6102, lng:85.2799},
+{state:"Chhattisgarh", disease:"Malaria", cases:1950, lat:21.2787, lng:81.8661},
+{state:"West Bengal", disease:"Malaria", cases:1900, lat:22.5726, lng:88.3639},
+{state:"Uttar Pradesh", disease:"Typhoid", cases:2200, lat:26.8467, lng:80.9462},
+{state:"Bihar", disease:"Typhoid", cases:1650, lat:25.5941, lng:85.1376},
+{state:"Karnataka", disease:"Diabetes Type 2", cases:2100, lat:12.9716, lng:77.5946},
+{state:"Tamil Nadu", disease:"Chikungunya", cases:1600, lat:13.0827, lng:80.2707},
+{state:"Gujarat", disease:"Hypertension", cases:1550, lat:23.0225, lng:72.5714}
+];
+
+// ===== CATEGORY =====
+const diseaseCategory = {
+  hotspot: ["dengue","malaria","typhoid","diabetes type 2","hypertension","chikungunya"],
+  common: ["fever","common cold","flu (influenza)","covid-19"]
+};
+
+const diseaseAlias = {
+  "chickenpox": "dengue",
+  "measles": "dengue",
+  "hepatitis a": "typhoid"
+};
+
+// ===== TOP 50 =====
+const diseases = [
+["Viral","Fever","High temperature, chills","Paracetamol, rest, fluids"],
+["Viral","Common Cold","Sneezing, runny nose","Steam, antihistamine"],
+["Viral","Flu (Influenza)","Fever, body pain","Antiviral (doctor), rest"],
+["Viral","COVID-19","Fever, cough","Isolation, symptomatic care"],
+["Viral","Dengue","High fever, joint pain","Fluids, paracetamol"],
+["Viral","Malaria","Fever cycles","Antimalarial"],
+["Viral","Typhoid","Prolonged fever","Antibiotics"],
+["Viral","Chickenpox","Itchy rash","Calamine"],
+["Viral","Measles","Rash, cough","Supportive care"],
+["Viral","Hepatitis A","Jaundice","Rest"],
+
+["Respiratory","Asthma","Breathlessness","Inhaler"],
+["Respiratory","Bronchitis","Cough mucus","Steam"],
+["Respiratory","Pneumonia","Chest pain","Antibiotics"],
+["Respiratory","Sinusitis","Facial pain","Decongestant"],
+["Respiratory","Tonsillitis","Sore throat","Warm gargle"],
+
+["Cardiac","Hypertension","Headache","BP meds"],
+["Cardiac","Hypotension","Fainting","Fluids"],
+["Cardiac","Heart Attack","Chest pain","Emergency"],
+["Cardiac","Arrhythmia","Irregular pulse","Cardio consult"],
+["Cardiac","High Cholesterol","Silent","Diet"],
+
+["Metabolic","Diabetes Type 2","Thirst","Metformin"],
+["Metabolic","Diabetes Type 1","Weight loss","Insulin"],
+["Metabolic","Obesity","High BMI","Diet"],
+["Metabolic","Hypothyroidism","Weight gain","Thyroxine"],
+["Metabolic","Hyperthyroidism","Weight loss","Antithyroid"],
+
+["Neurological","Migraine","Severe headache","Pain reliever"],
+["Neurological","Epilepsy","Seizures","Antiepileptics"],
+["Neurological","Stroke","Weakness","Emergency"],
+["Neurological","Parkinson’s","Tremor","Dopamine meds"],
+["Neurological","Alzheimer’s","Memory loss","Supportive"],
+
+["Digestive","Gastritis","Burning stomach","Antacid"],
+["Digestive","GERD","Acid reflux","PPI"],
+["Digestive","Peptic Ulcer","Stomach pain","PPI"],
+["Digestive","Constipation","Hard stool","Fiber"],
+["Digestive","Diarrhea","Loose motion","ORS"],
+
+["Skin","Acne","Pimples","Benzoyl peroxide"],
+["Skin","Eczema","Itchy skin","Moisturizer"],
+["Skin","Psoriasis","Scaly patches","Steroid cream"],
+["Skin","Fungal Infection","Ring rash","Antifungal"],
+["Skin","Scabies","Night itching","Permethrin"],
+
+["Others","Arthritis","Joint pain","NSAIDs"],
+["Others","Osteoporosis","Weak bones","Calcium"],
+["Others","Anemia","Fatigue","Iron"],
+["Others","Kidney Stones","Flank pain","Fluids"],
+["Others","UTI","Burning urine","Antibiotics"],
+["Others","Depression","Low mood","Therapy"],
+["Others","Anxiety","Restlessness","Counseling"],
+["Others","Allergies","Sneezing","Antihistamine"],
+["Others","Food Poisoning","Vomiting","ORS"],
+["Others","Dehydration","Dry mouth","Fluids"]
+];
+
+// ===== BADGE =====
+function getDiseaseBadge(name){
+ const lower=name.toLowerCase();
+ if(diseaseCategory.hotspot.includes(lower))
+   return '<span style="color:#ff6a00;font-size:11px;">📍 Hotspot Data</span>';
+ if(diseaseCategory.common.includes(lower))
+   return '<span style="color:#00eaff;font-size:11px;">🌍 Common</span>';
+ return '<span style="color:#ffd166;font-size:11px;">⚠ Limited Data</span>';
+}
+
+// ===== RENDER =====
+const listDiv=document.getElementById("diseaseList");
+
+function render(list){
+ listDiv.innerHTML="";
+ list.forEach(d=>{
+  listDiv.innerHTML+=`
+  <div class="disease-card" onclick="openMapForDisease('${d[1].toLowerCase()}')">
+   <div class="tag">${d[0]}</div>
+   <b>${d[1]}</b><br>
+   ${getDiseaseBadge(d[1])}
+   <div class="symptoms">⚠ ${d[2]}</div>
+   <div class="symptoms">💊 ${d[3]}</div>
+  </div>`;
+ });
+}
+render(diseases);
+
+// search
+document.getElementById("searchInput").addEventListener("keyup",function(){
+ const val=this.value.toLowerCase();
+ render(diseases.filter(d=>d.join(" ").toLowerCase().includes(val)));
+});
+
+// ===== MAP LOGIC =====
+function openMapForDisease(name){
+ const wrapper=document.getElementById("mapWrapper");
+ wrapper.style.display="block";
+
+ setTimeout(()=>{
+     initMap();
+     allMarkers.forEach(m=>map.removeLayer(m));
+     allMarkers=[];
+
+     const lower=name.toLowerCase();
+
+     if(diseaseCategory.hotspot.includes(lower)){
+        const filtered = indiaData.filter(d =>
+            d.disease.toLowerCase().includes(lower)
+        );
+
+        filtered.forEach(d=>{
+            const m=L.circleMarker([d.lat,d.lng],{
+              radius:Math.sqrt(d.cases)/3,
+              color:getColor(d.cases),
+              fillColor:getColor(d.cases),
+              fillOpacity:0.8
+            }).addTo(map)
+            .bindPopup(`<b>${d.state}</b><br>${d.disease}<br>Cases: ${d.cases}`);
+            allMarkers.push(m);
+        });
+
+        map.setView([filtered[0].lat, filtered[0].lng],6);
+        showToast("📍 Showing high-risk regions");
+        return;
+     }
+
+     if(diseaseCategory.common.includes(lower)){
+        showToast("🌍 This disease is common across India.");
+        map.setView([22.9734,78.6569],5);
+        return;
+     }
+
+     if(diseaseAlias[lower]){
+        showToast("ℹ️ Limited regional data — showing closest pattern.");
+        const alias=diseaseAlias[lower];
+
+        const filtered = indiaData.filter(d =>
+            d.disease.toLowerCase().includes(alias)
+        );
+
+        filtered.forEach(d=>{
+            const m=L.circleMarker([d.lat,d.lng],{
+              radius:Math.sqrt(d.cases)/3,
+              color:getColor(d.cases),
+              fillColor:getColor(d.cases),
+              fillOpacity:0.8
+            }).addTo(map);
+            allMarkers.push(m);
+        });
+
+        map.setView([filtered[0].lat, filtered[0].lng],6);
+        return;
+     }
+
+     showToast("ℹ️ Detailed regional data not available.");
+     map.setView([22.9734,78.6569],5);
+
+ },200);
+
+ wrapper.scrollIntoView({behavior:"smooth"});
+}
+</script>
+
+<!-- Chatbot Mount -->
+<div id="chatbotMount"></div>
+
+<script>
+fetch("/frontend/chat-widget.html")
+  .then(r=>r.text())
+  .then(html=>{
+    document.getElementById("chatbotMount").innerHTML = html;
+
+    const s = document.createElement("script");
+    s.src="/frontend/chatbot.js";
+    document.body.appendChild(s);
+  });
+</script>
+<script>
+  // ✅ Block dashboard if not logged in
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    alert("Please login first!");
+    window.location.href = "home.html"; // tumhare login page ka naam
+  }
+</script>
+<script>
+  function logout() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
+    alert("Logged out successfully");
+    window.location.href = "home.html";
+  }
+</script>
+<script>
+async function loadProfile() {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    window.location.href = "home.html";
+    return;
+  }
+
+  try {
+    const res = await fetch("http://localhost:5001/api/auth/me", {
+      headers: {
+        "Authorization": "Bearer " + token
+      }
+    });
+
+    const data = await res.json();
+
+    if (!data.ok) {
+      localStorage.removeItem("token");
+      window.location.href = "home.html";
+      return;
+    }
+
+    const u = data.user;
+
+    // Dropdown Fill
+    document.getElementById("pmName").innerText = u.full_name || "User";
+    document.getElementById("pmEmail").innerText = u.email || "—";
+    document.getElementById("pmMobile").innerText = u.mobile || "—";
+    document.getElementById("pmId").innerText = u.id || "—";
+
+    // Avatar Initial
+    const letter = (u.full_name || "U").trim().charAt(0).toUpperCase();
+    document.getElementById("profileAvatar").innerText = letter;
+    document.getElementById("pmAvatar").innerText = letter;
+
+  } catch (err) {
+    console.log("Profile Load Error:", err);
+  }
+}
+
+loadProfile();
+</script>
+
+<script>
+  // Avatar dropdown toggle
+  const avatar = document.getElementById("profileAvatar");
+  const menu = document.getElementById("profileMenu");
+
+  avatar.addEventListener("click", () => {
+    menu.classList.toggle("show");
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".profile-wrap")) {
+      menu.classList.remove("show");
+    }
+  });
+</script>
+
+</body>
+</html>

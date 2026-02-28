@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WebDoc | HexCare AI</title>
+
+  <style>
+    :root{
+      --bg:#061826;
+      --panel:#0b2233;
+      --border:rgba(0,234,255,.18);
+      --accent:#00eaff;
+      --text:#eaf6ff;
+      --muted:rgba(234,246,255,.7);
+    }
+    body{margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto; background:var(--bg); color:var(--text);}
+    .wa-overlay{position:fixed; inset:0; background:rgba(0,0,0,.55); display:none; z-index:9998;}
+    .wa-overlay.active{display:block;}
+
+    .wa-fab{
+      position:fixed; right:22px; bottom:22px; z-index:9999;
+      width:56px; height:56px; border-radius:18px;
+      display:flex; align-items:center; justify-content:center;
+      cursor:pointer;
+      background:linear-gradient(135deg, rgba(0,234,255,.35), rgba(0,234,255,.15));
+      border:1px solid var(--border);
+      box-shadow:0 10px 30px rgba(0,0,0,.35);
+      user-select:none;
+      font-size:22px;
+    }
+
+    .wa-chat{
+      position:fixed; right:22px; bottom:92px; z-index:9999;
+      width:360px; max-width: calc(100vw - 44px);
+      height:520px; max-height: calc(100vh - 140px);
+      display:none;
+      flex-direction:column;
+      background:rgba(12,34,50,.88);
+      border:1px solid var(--border);
+      border-radius:18px;
+      overflow:hidden;
+      box-shadow:0 18px 60px rgba(0,0,0,.55);
+      backdrop-filter: blur(10px);
+    }
+
+    .wa-header{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:12px 12px;
+      border-bottom:1px solid var(--border);
+      background:rgba(6,24,38,.7);
+    }
+    .wa-title{display:flex; align-items:center; gap:10px;}
+    .wa-avatar{
+      width:38px; height:38px; border-radius:14px;
+      display:flex; align-items:center; justify-content:center;
+      background:rgba(0,234,255,.12);
+      border:1px solid var(--border);
+      font-size:18px;
+    }
+    .wa-name{font-weight:700; letter-spacing:.2px}
+    .wa-status{font-size:12px; color:var(--muted); margin-top:2px}
+    .wa-actions{display:flex; align-items:center; gap:8px;}
+    .wa-select{
+      background:rgba(255,255,255,.08);
+      color:var(--text);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:12px;
+      padding:8px 10px;
+      outline:none;
+      font-size:12px;
+    }
+    .wa-icon{
+      width:36px; height:36px; border-radius:12px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.08);
+      color:var(--text);
+      cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      font-size:16px;
+    }
+
+    .wa-body{flex:1; overflow:auto; padding:12px; display:flex; flex-direction:column; gap:10px;}
+    .bubble{
+      max-width:86%;
+      padding:10px 12px;
+      border-radius:14px;
+      line-height:1.45;
+      font-size:14px;
+      white-space:pre-wrap;
+      word-wrap:break-word;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.07);
+    }
+    .bubble.user{
+      margin-left:auto;
+      background:rgba(0,234,255,.14);
+      border:1px solid rgba(0,234,255,.22);
+    }
+    .typing{
+      display:inline-flex; gap:6px; align-items:center;
+    }
+    .dot{width:7px;height:7px;border-radius:99px;background:rgba(234,246,255,.65); animation:b 1.2s infinite;}
+    .dot:nth-child(2){animation-delay:.15s}
+    .dot:nth-child(3){animation-delay:.3s}
+    @keyframes b{0%,100%{transform:translateY(0);opacity:.55}50%{transform:translateY(-4px);opacity:1}}
+
+    .wa-footer{
+      display:flex; align-items:center; gap:8px;
+      padding:10px;
+      border-top:1px solid var(--border);
+      background:rgba(6,24,38,.7);
+    }
+    .wa-input{
+      flex:1;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      outline:none;
+    }
+    .wa-send{
+      width:44px; height:44px; border-radius:14px;
+      border:1px solid rgba(0,234,255,.25);
+      background:rgba(0,234,255,.14);
+      cursor:pointer;
+      color:var(--text);
+      font-size:16px;
+    }
+    .wa-mic.listening{outline:2px solid rgba(0,234,255,.55);}
+  </style>
+</head>
+
+<body>
+
+  <!-- Floating Button -->
+  <div class="wa-fab" id="waFab" title="Chat">💬</div>
+
+  <!-- Overlay -->
+  <div class="wa-overlay" id="waOverlay"></div>
+
+  <!-- Widget -->
+  <div class="wa-chat" id="chatWidget" aria-hidden="true">
+    <div class="wa-header">
+      <div class="wa-title">
+        <div class="wa-avatar">🩺</div>
+        <div>
+          <div class="wa-name">HexCare AI</div>
+          <div class="wa-status" id="waStatus">Online • Ready</div>
+        </div>
+      </div>
+
+      <div class="wa-actions">
+        <select id="langSelect" class="wa-select" title="Language">
+          <option value="en-IN">English</option>
+          <option value="hi-IN">Hindi</option>
+        </select>
+
+        <button class="wa-icon" id="voiceBtn" title="Voice On/Off">🔊</button>
+        <button class="wa-icon" id="micBtn" title="Mic">🎤</button>
+        <button class="wa-icon" id="closeBtn" title="Close">✕</button>
+      </div>
+    </div>
+
+    <div class="wa-body" id="chatBody"></div>
+
+    <div class="wa-footer">
+      <input id="userInput" class="wa-input" placeholder="Ask health question..." />
+      <button class="wa-send" id="sendBtn" title="Send">➤</button>
+    </div>
+  </div>
+
+  <script src="./chatbot.js"></script>
+</body>
+</html>
