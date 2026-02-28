@@ -39,7 +39,7 @@ app.get("/", (req, res) => {
 });
 
 // ✅ CORS fix (127.0.0.1:3000 -> localhost:5001)
-app.use(cors({ origin: true, methods: ["GET","POST","OPTIONS"], allowedHeaders: ["Content-Type"] }));
+app.use(cors({ origin: true, methods: ["GET","POST","OPTIONS"], allowedHeaders: ["Content-Type","Authorization"] }));
 
 // ✅ health check
 app.get("/health", (req,res)=> res.json({ ok:true, time: new Date().toISOString() }));

@@ -6,7 +6,7 @@
 // - Mic auto-send safe
 // ============================
 
-const API_PATH = "http://localhost:5001/api/chat"; // change to "/chat" if your backend uses /chat
+const API_BASE = "https://hackathon-project-lls.onrender.com"; // change to "/chat" if your backend uses /cha  // change to "/chat" if your backend uses /chat
 
 // DOM
 const waFab = document.getElementById("waFab");
